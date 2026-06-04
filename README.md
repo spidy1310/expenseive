@@ -1,6 +1,6 @@
 # Expenseive
 
-A personal finance tracker built as a Progressive Web App (PWA). Works on Android and iPhone — install it to your home screen and it runs like a native app, fully offline.
+A personal finance tracker built as a Progressive Web App (PWA). Works on Android and iPhone, install it to your home screen and it runs like a native app, fully offline.
 
 No accounts, no subscriptions, no servers. Your data never leaves your device.
 
@@ -48,27 +48,9 @@ Security was treated seriously, not as an afterthought.
 
 ---
 
-## Hosting
-
-The app is a static site — no backend required. It can be hosted for free on:
-
-- [GitHub Pages](https://pages.github.com) — push to a repo and enable Pages in settings
-- [Netlify](https://app.netlify.com/drop) — drag and drop the folder
-- [Cloudflare Pages](https://pages.cloudflare.com) — connect your GitHub repo
-
-A custom domain is optional. The free subdomain (e.g. `yourname.github.io/expenseive`) works perfectly and PWA install works on any HTTPS URL.
-
----
-
-## Redeploying
-
-Your data is stored in your browser's `localStorage`, tied to the domain. Pushing new code to the repo and redeploying does **not** touch your data. You can update the app as many times as you like — existing transactions, budgets, and goals stay intact.
-
----
-
 ## Tech Stack
 
-Vanilla HTML, CSS, and JavaScript — no frameworks, no build step, no dependencies. The Web Crypto API handles all encryption natively in the browser.
+Vanilla HTML, CSS, and JavaScript, no frameworks, no build step, no dependencies. The Web Crypto API handles all encryption natively in the browser.
 
 ```
 expenseive/
