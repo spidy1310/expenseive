@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <!-- ── Security headers ── -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             script-src 'self';
+             style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
+             font-src https://fonts.gstatic.com;
+             img-src 'self' data:;
+             connect-src 'none';
+             object-src 'none';
+             base-uri 'self';
+             form-action 'none';
+             frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="no-referrer" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Expenseive" />
+  <meta name="description" content="Your personal finance tracker" />
+  <title>Expenseive</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ══ AUTH SCREEN ══ -->
+    <div id="auth-screen" class="screen active">
+      <div class="auth-bg"></div>
+      <div class="auth-container">
+        <div class="auth-logo">
+          <div class="logo-mark">₹</div>
+          <h1 class="app-name">Expenseive</h1>
+          <p class="app-tagline">Smart money, smarter you.</p>
+        </div>
+
+        <!-- Login -->
+        <div class="auth-card" id="login-form">
+          <h2>Welcome back</h2>
+          <p class="auth-subtitle">Sign in to your account</p>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="login-username" placeholder="your username" autocomplete="username" maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" maxlength="128" />
+              <button class="pw-toggle" id="btn-pw-login" type="button">👁</button>
+            </div>
+          </div>
+          <div id="login-error" class="form-error hidden"></div>
+          <button class="btn-primary" id="btn-login">Sign In</button>
+          <p class="auth-switch" style="margin-bottom:4px">New here? <a href="#" id="link-go-register">Create account</a></p>
+          <p class="auth-switch"><a href="#" id="link-forgot-password" style="color:var(--text3);font-size:13px">Forgot password?</a> &nbsp;·&nbsp; <a href="#" id="link-forgot-username" style="color:var(--text3);font-size:13px">Forgot username?</a></p>
+        </div>
+
+        <!-- Register -->
+        <div class="auth-card hidden" id="register-form">
+          <h2>Create account</h2>
+          <p class="auth-subtitle">Set up your finance profile</p>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="reg-name" placeholder="Your name" maxlength="80" />
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="reg-username" placeholder="choose a username" autocomplete="username" maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="reg-password" placeholder="min 8 characters" autocomplete="new-password" maxlength="128" />
+              <button class="pw-toggle" id="btn-pw-reg" type="button">👁</button>
+            </div>
+            <div class="pw-strength-bar"><div id="pw-strength-fill"></div></div>
+            <small id="pw-strength-label" class="pw-hint"></small>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="reg-confirm" placeholder="repeat password" autocomplete="new-password" maxlength="128" />
+              <button class="pw-toggle" id="btn-pw-confirm" type="button">👁</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Monthly Income (₹)</label>
+            <input type="number" id="reg-income" placeholder="e.g. 50000" min="0" max="99999999" />
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="reg-currency">
+              <option value="INR" selected>₹ Indian Rupee (INR)</option>
+              <option value="USD">$ US Dollar (USD)</option>
+              <option value="EUR">€ Euro (EUR)</option>
+              <option value="GBP">£ British Pound (GBP)</option>
+            </select>
+          </div>
+          <div id="reg-error" class="form-error hidden"></div>
+          <button class="btn-primary" id="btn-register">Create Account</button>
+          <p class="auth-switch">Already have one? <a href="#" id="link-go-login">Sign in</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MAIN APP ══ -->
+    <div id="main-app" class="screen hidden">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <span class="header-logo">₹</span>
+          <span class="header-title">Expenseive</span>
+        </div>
+        <div class="header-right">
+          <button class="icon-btn" id="btn-open-search" title="Search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <div class="avatar" id="user-avatar"></div>
+        </div>
+      </header>
+
+      <!-- Bottom Nav -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-tab="transactions" id="nav-transactions">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>
+          <span>Expenses</span>
+        </button>
+        <button class="nav-item add-btn" id="btn-open-add">
+          <div class="add-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </button>
+        <button class="nav-item" data-tab="analytics" id="nav-analytics">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Analytics</span>
+        </button>
+        <button class="nav-item" data-tab="budget" id="nav-budget">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="M16 2l2 2-2 2"/><path d="M21 7l-2-2 2-2"/></svg>
+          <span>Budget</span>
+        </button>
+      </nav>
+
+      <!-- Content -->
+      <main class="content">
+        <!-- Dashboard -->
+        <div id="tab-dashboard" class="tab-content active">
+          <div class="greeting-section">
+            <div>
+              <p class="greeting-sub">Good <span id="greeting-time"></span> 👋</p>
+              <h2 class="greeting-name" id="greeting-name"></h2>
+            </div>
+            <div class="month-badge" id="current-month-badge"></div>
+          </div>
+          <div class="balance-card">
+            <div class="balance-top">
+              <span class="balance-label">Monthly Budget</span>
+              <span class="balance-period" id="balance-period"></span>
+            </div>
+            <div class="balance-amount" id="balance-amount">₹0</div>
+            <div class="balance-bars">
+              <div class="balance-bar-row"><span>Needs (50%)</span><div class="mini-bar"><div class="mini-fill needs" id="needs-bar"></div></div><span id="needs-pct">0%</span></div>
+              <div class="balance-bar-row"><span>Wants (30%)</span><div class="mini-bar"><div class="mini-fill wants" id="wants-bar"></div></div><span id="wants-pct">0%</span></div>
+              <div class="balance-bar-row"><span>Savings (20%)</span><div class="mini-bar"><div class="mini-fill savings" id="savings-bar"></div></div><span id="savings-pct">0%</span></div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-icon income-icon">↑</div><div><div class="stat-value" id="stat-income">₹0</div><div class="stat-label">Income</div></div></div>
+            <div class="stat-card"><div class="stat-icon expense-icon">↓</div><div><div class="stat-value" id="stat-expense">₹0</div><div class="stat-label">Spent</div></div></div>
+            <div class="stat-card"><div class="stat-icon saved-icon">🎯</div><div><div class="stat-value" id="stat-remaining">₹0</div><div class="stat-label">Left</div></div></div>
+          </div>
+          <div class="section-header"><h3>Category Breakdown</h3><span class="section-sub" id="cat-month-label"></span></div>
+          <div class="category-list" id="category-list"></div>
+          <div class="section-header"><h3>Recent</h3><a href="#" id="link-see-all" class="see-all">See all</a></div>
+          <div id="recent-list" class="txn-list"></div>
+        </div>
+
+        <!-- Transactions -->
+        <div id="tab-transactions" class="tab-content hidden">
+          <div class="tab-header">
+            <h2>Expenses</h2>
+            <div class="filter-row">
+              <select id="txn-filter-month"></select>
+              <select id="txn-filter-cat"></select>
+            </div>
+          </div>
+          <div class="search-bar-inline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="txn-search" placeholder="Search transactions..." maxlength="100" />
+          </div>
+          <div id="txn-list" class="txn-list"></div>
+        </div>
+
+        <!-- Analytics -->
+        <div id="tab-analytics" class="tab-content hidden">
+          <div class="tab-header">
+            <h2>Analytics</h2>
+            <select id="analytics-month"></select>
+          </div>
+          <div class="analytics-grid">
+            <div class="an-card full"><h4>Monthly Spending Trend</h4><canvas id="trend-chart" height="180"></canvas></div>
+            <div class="an-card full"><h4>Category Split</h4><div id="cat-donut-wrapper"><canvas id="donut-chart" width="200" height="200"></canvas><div id="donut-legend"></div></div></div>
+            <div class="an-card"><h4>Payment Mode</h4><div id="payment-breakdown"></div></div>
+            <div class="an-card"><h4>Need vs Want</h4><div id="type-breakdown"></div></div>
+          </div>
+          <div class="section-header" style="margin-top:20px"><h3>Weekly Analysis</h3></div>
+          <div id="weekly-list"></div>
+          <div class="section-header" style="margin-top:20px"><h3>Top Expenses</h3></div>
+          <div id="top-expenses-list" class="txn-list"></div>
+        </div>
+
+        <!-- Budget -->
+        <div id="tab-budget" class="tab-content hidden">
+          <div class="tab-header">
+            <h2>Budget</h2>
+            <button class="btn-sm" id="btn-open-budget-modal">+ Set Budget</button>
+          </div>
+          <div class="budget-50-30-20">
+            <div class="rule-header"><h4>50 / 30 / 20 Rule</h4><span class="rule-sub">Based on your monthly income</span></div>
+            <div id="rule-breakdown"></div>
+          </div>
+          <div class="section-header" style="margin-top:20px"><h3>Category Budgets</h3></div>
+          <div id="cat-budgets-list"></div>
+          <div class="section-header" style="margin-top:20px">
+            <h3>Savings Goals</h3>
+            <button class="btn-sm" id="btn-open-goal-modal">+ Add Goal</button>
+          </div>
+          <div id="goals-list"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ══ MODALS ══ -->
+
+    <!-- Add Expense -->
+    <div id="add-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="add-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3 id="add-modal-title">Add Expense</h3>
+          <button class="close-btn" data-close="add-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="type-toggle">
+            <button class="toggle-btn active" id="toggle-expense">Expense</button>
+            <button class="toggle-btn" id="toggle-income">Income</button>
+          </div>
+          <div class="form-group">
+            <label>Amount (₹)</label>
+            <input type="number" id="add-amount" placeholder="0.00" min="0.01" step="0.01" max="99999999" class="amount-input" />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="add-desc" placeholder="What did you spend on?" maxlength="200" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="add-category"></select>
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="add-type">
+                <option value="Need">Need</option>
+                <option value="Want">Want</option>
+                <option value="Saving">Saving</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Payment Mode</label>
+              <select id="add-payment">
+                <option value="UPI">UPI</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Net Banking">Net Banking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="add-date" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes (optional)</label>
+            <input type="text" id="add-notes" placeholder="Any notes..." maxlength="300" />
+          </div>
+          <div id="add-error" class="form-error hidden"></div>
+          <button class="btn-primary" id="save-txn-btn">Save Expense</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div id="search-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="search-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Search</h3>
+          <button class="close-btn" data-close="search-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="search-bar-inline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="global-search" placeholder="Search expenses..." maxlength="100" />
+          </div>
+          <div id="search-results" class="txn-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div id="profile-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="profile-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Profile &amp; Settings</h3>
+          <button class="close-btn" data-close="profile-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="profile-section">
+            <div class="profile-avatar-lg" id="profile-avatar-lg"></div>
+            <div class="profile-info">
+              <div class="profile-name" id="profile-name-display"></div>
+              <div class="profile-username" id="profile-username-display"></div>
+            </div>
+          </div>
+          <div class="settings-list">
+            <div class="settings-item">
+              <span>Monthly Income</span>
+              <div class="settings-value-row">
+                <input type="number" id="settings-income" min="0" max="99999999" />
+                <button class="btn-xs" id="btn-save-settings">Save</button>
+              </div>
+            </div>
+            <div class="settings-item">
+              <span>Currency</span>
+              <select id="settings-currency">
+                <option value="INR">₹ INR</option>
+                <option value="USD">$ USD</option>
+                <option value="EUR">€ EUR</option>
+                <option value="GBP">£ GBP</option>
+              </select>
+            </div>
+            <div class="settings-item">
+              <span>Theme</span>
+              <div class="theme-toggle" id="btn-toggle-theme"><div class="theme-thumb" id="theme-thumb"></div></div>
+            </div>
+          </div>
+          <div class="danger-zone">
+            <button class="btn-danger" id="btn-export">📤 Export Data (JSON)</button>
+            <button class="btn-danger outline" id="btn-open-catmgr">🗂 Manage Categories</button>
+            <button class="btn-danger outline" id="btn-logout">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Manager -->
+    <div id="catmgr-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="catmgr-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Manage Categories</h3>
+          <button class="close-btn" data-close="catmgr-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="auth-subtitle" style="margin-bottom:16px">Your categories — changes only affect your account.</p>
+          <div id="catmgr-list"></div>
+          <div class="catmgr-add-row">
+            <div class="form-group" style="margin-bottom:8px">
+              <label>New Category Name</label>
+              <input type="text" id="catmgr-name" placeholder="e.g. Travel" maxlength="50" />
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group">
+                <label>Icon (emoji)</label>
+                <input type="text" id="catmgr-icon" placeholder="✈️" maxlength="4" />
+              </div>
+              <div class="form-group">
+                <label>Colour</label>
+                <input type="color" id="catmgr-color" value="#6366f1" style="height:42px;padding:4px 6px" />
+              </div>
+            </div>
+            <div id="catmgr-error" class="form-error hidden"></div>
+            <button class="btn-primary" id="btn-add-category">+ Add Category</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div id="budget-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="budget-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Set Category Budget</h3>
+          <button class="close-btn" data-close="budget-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="budget-cat"></select>
+          </div>
+          <div class="form-group">
+            <label>Monthly Budget Amount (₹)</label>
+            <input type="number" id="budget-amount" placeholder="0" min="0" max="99999999" />
+          </div>
+          <button class="btn-primary" id="btn-save-budget">Set Budget</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goal-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="goal-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Add Savings Goal</h3>
+          <button class="close-btn" data-close="goal-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Goal Name</label>
+            <input type="text" id="goal-name" placeholder="e.g. Emergency Fund" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label>Target Amount (₹)</label>
+            <input type="number" id="goal-target" placeholder="0" min="1" max="99999999" />
+          </div>
+          <div class="form-group">
+            <label>Current Saved (₹)</label>
+            <input type="number" id="goal-saved" placeholder="0" min="0" max="99999999" />
+          </div>
+          <div class="form-group">
+            <label>Target Date</label>
+            <input type="date" id="goal-date" />
+          </div>
+          <button class="btn-primary" id="btn-save-goal">Add Goal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Detail -->
+    <div id="detail-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close="detail-modal"></div>
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3>Transaction</h3>
+          <button class="close-btn" data-close="detail-modal">✕</button>
+        </div>
+        <div class="modal-body" id="detail-body"></div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
